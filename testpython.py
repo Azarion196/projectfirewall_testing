@@ -1,13 +1,10 @@
-import socket
+#imports
+import socket, subprocess, sockertserver, nmap
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.connect(("8.8.8.8", 80))
 ip = s.getsockname()[0]
 s.close()
 #This script will test our network
-
-#imports
-import subprocess
-import socketserver
 
 #Global_Constants
 ipclass = ip[0:2]
@@ -75,11 +72,26 @@ def menu_outside():
     menu_outside()
 
 def testfw_in():
-    print('')
+    nm = nmap.PortScanner()
+    for host in nm.allhosts():
+      print('-'*25)
+      print('Host : %s (%s)' % (host, nm[host].hostname()))
+      print('State : %s' % nm[host].state())
+      for proto in nm[host].all_protocols():
+        print('-'*10)
+        print('Protocol : %s' % proto)
+        
+        lport = nm[host][proto].keys()
+        lport.sort()
+        for port in lport:
+          print('port : %s\tstate : %s' % (port, nm[host][proto][port]['state']))
+    
     try:
         subprocess.call(["ping", "10.140.66.64","-c","1"])
     except Exception as error:
         print(error)
+        
+    
 
 
 def testweb_in():
